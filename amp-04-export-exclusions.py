@@ -7,10 +7,10 @@ from dotenv import load_dotenv
 # Load .env file variables
 load_dotenv()
 CLIENT_ID = os.getenv('CLIENT_ID')
-API_KEY = os.getenv('API_KEY')
+CLIENT_PASSWORD = os.getenv('CLIENT_PASSWORD')
 
-if not CLIENT_ID or not API_KEY:
-	raise "Need a CLIENT_ID and/or API_KEY variables added to .env file"
+if not CLIENT_ID or not CLIENT_PASSWORD:
+       raise "Need a CLIENT_ID and/or CLIENT_PASSWORD environment variables."
 
 CLOUD = os.getenv("CLOUD")
 if CLOUD == "NAM":
@@ -31,7 +31,7 @@ def get_se_access_token():
     :return Secure Endpoints access token
     """
 
-    auth = (CLIENT_ID, API_KEY)
+    auth = (CLIENT_ID, CLIENT_PASSWORD)
     securex_url = f"{base_securex_url}/iroh/oauth2/token"
     data = {"grant_type": "client_credentials"}
     headers = {
