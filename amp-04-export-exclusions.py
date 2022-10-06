@@ -97,7 +97,7 @@ def get_exclusion_sets(se_access_token, org_id, start=0, exclusion_sets=[]):
     :param exclusion_sets List of previously pulled exclusion sets, used for pagination
     :return exclusion_sets List of all exlusion sets for an org
     """
-    exclusion_sets_url = f"https://api.amp.cisco.com/v3/organizations/{org_id}/exclusion_sets"
+    exclusion_sets_url = f"{base_secure_endpoint_url}/organizations/{org_id}/exclusion_sets"
     data = {
         "size": 100,
         "start": start
