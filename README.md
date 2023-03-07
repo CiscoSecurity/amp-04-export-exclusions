@@ -17,8 +17,10 @@ Python version 3.5+
 Go through the [Authentication instructions](https://developer.cisco.com/docs/secure-endpoint/#!authentication) for SecureX to integrate Secure Endpoint and create an API Client. 
 
 Install python requirements:
-    pip install requests
-    pip install python-dotenv
+```
+pip install requests
+pip install python-dotenv
+```
 
 # Usage
 When you first run the script you'll get authenticated and then presented with a list of organizations you belong to.
