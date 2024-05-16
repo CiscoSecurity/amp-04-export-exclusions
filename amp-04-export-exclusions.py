@@ -38,7 +38,7 @@ def get_se_access_token():
         'Content-Type': 'application/x-www-form-urlencoded',
         'Accept': 'application/json',
     }
-    
+
     # Authenticate with SecureX and get an access_token
     sx_response = requests.post(securex_url, headers=headers, data=data, auth=auth)
     if sx_response.status_code == 400:
@@ -52,7 +52,7 @@ def get_se_access_token():
     }
     se_response = requests.post(secure_endpoint_url, headers=headers)
     se_access_token = se_response.json().get("access_token")
-    
+
     return se_access_token
 
 def get_organization_id(se_access_token):
@@ -67,7 +67,7 @@ def get_organization_id(se_access_token):
     data={"size": 100}
     headers = {'Authorization': f'Bearer {se_access_token}'}
     org_response = requests.get(org_url, headers=headers, data=data)
-    
+
     print("Which organization would you like to list exclusions from?")
     for idx, org in enumerate(org_response.json().get('data')):
         print(f"[{idx + 1}] - {org['name']}")
@@ -125,7 +125,7 @@ def select_exclusion_set(exclusion_sets, se_access_token, org_id):
         exit("There are no exclusion sets for this organization.")
     print("Which exclusion set would you like to list exclusions from?")
     for idx, exclusion_set in enumerate(exclusion_sets):
-        print(f"[{idx + 1}] - {exclusion_set['name']}")
+        print(f"[{idx + 1}] - {exclusion_set['properties']['name']}")
     print(f"[{idx + 2}] - All exlcusion lists. NOTE: May be very time intensive depending on the volume.")
     try:
         choice = int(input("Input a number listed above: ")) - 1
@@ -173,11 +173,11 @@ def export_to_json(exclusion_set_data, exclusion_set_info):
     :param exclusion_set_data All data for an exclusion set, including all exclusions
     :param exclusion_set_info Dictionary with name, guid and operatingSystem of an exclusion set
     """
-    with open(f'{exclusion_set_info["name"]}.json', 'w') as outfile:
+    with open(f'{exclusion_set_info["properties"]["name"]}.json', 'w') as outfile:
         outfile.write(json.dumps(exclusion_set_info)+'\n')
         for exclusion in exclusion_set_data:
             outfile.write(json.dumps(exclusion)+'\n')
-        print(f"{exclusion_set_info['name']}.json has been created in the current directory.")
+        print(f"{exclusion_set_info['properties']['name']}.json has been created in the current directory.")
 
 def export_to_csv(exclusion_set_data, exclusion_set_info):
     """
@@ -185,7 +185,7 @@ def export_to_csv(exclusion_set_data, exclusion_set_info):
     :param exclusion_set_data All data for an exclusion set, including all exclusions
     :param exclusion_set_info Dictionary with name, guid and operatingSystem of an exclusion set
     """
-    with open(f'{exclusion_set_info["name"]}.csv', 'w') as outfile:
+    with open(f'{exclusion_set_info["properties"]["name"]}.csv', 'w') as outfile:
         outfile.write("ExclusionGUID,Exclusion Type,Path,File Extension,Any Drive,FileScanEngine,FileScanChild,MAP,BP,SPP,Process Path,Process SHA\n")
         for exclusion in exclusion_set_data:
             guid = exclusion.get("guid", "")
@@ -201,7 +201,7 @@ def export_to_csv(exclusion_set_data, exclusion_set_info):
             processPath = exclusion.get("process", {}).get("path", "")
             processSHA = exclusion.get("process", {}).get("sha", "")
             outfile.write(f"{guid},{exclusionType},{path},{fileExtension},{anyDrive},{fileScan},{fileScanChild},{MAP},{bp},{spp},{processPath},{processSHA}\n")
-    print(f"{exclusion_set_info['name']}.csv has been created in the current directory.")
+    print(f"{exclusion_set_info['properties']['name']}.csv has been created in the current directory.")
 
 def json_or_csv():
     """
@@ -212,7 +212,7 @@ def json_or_csv():
     print("[2] - JSON")
     choice = input("Do you want the output in JSON or CSV? ")
     if choice == '1' or choice == '2':
-        return choice    
+        return choice
     else:
         print("Choice must be 1 or 2.  Try again")
         json_or_csv()
@@ -247,13 +247,13 @@ if __name__ == "__main__":
 
     # Get a specific exclusion set guid
     exclusion_set_info = select_exclusion_set(exclusion_sets, se_access_token, org_id)
-    
+
     # Pull exclusions using the org_id and exclusion_set guid
     exclusion_set_data = get_exclusion_set_data(se_access_token, org_id, exclusion_set_info)
 
     # Choose data output format
     format = json_or_csv()
-    
+
     # Export data to file in json or csv format
     if format == '1':
         export_to_csv(exclusion_set_data, exclusion_set_info)
